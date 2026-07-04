@@ -1,0 +1,23 @@
+name: Refresh Daily Drive
+on:
+  schedule:
+    - cron: "0 10 * * *"
+  workflow_dispatch:
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm install
+      - name: Restore config and token from secrets
+        env:
+          CONFIG_YAML: ${{ secrets.CONFIG_YAML }}
+          SPOTIFY_TOKEN: ${{ secrets.SPOTIFY_TOKEN }}
+        run: |
+          printf '%s' "$CONFIG_YAML" > config.yaml
+          printf '%s' "$SPOTIFY_TOKEN" > .spotify-token.json
+      - run: node index.js
